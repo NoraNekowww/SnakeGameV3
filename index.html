@@ -8,20 +8,55 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
     <div id="mainMenu">
         <h1>🌐 拓扑领地战</h1>
         
         <span class="section-title">游玩模式</span>
         <div class="btn-group">
-            <button class="toggle-btn selected" id="modePVE">单机 VS AI</button>
-            <button class="toggle-btn" id="modePVP">本地双人</button>
-            <button class="toggle-btn" id="modeHost">建房(主机)</button>
-            <button class="toggle-btn" id="modeJoin">加房(客机)</button>
+            <button class="toggle-btn selected" id="modePVE">高级AI挑战</button>
+            <button class="toggle-btn" id="modePVP">本地游戏</button>
+            <button class="toggle-btn" id="modeHost">建立房间</button>
+            <button class="toggle-btn" id="modeJoin">加入房间</button>
         </div>
         
+        <div id="playerSettingsSection" style="display:none; margin-top: 15px;">
+            <details open style="margin-bottom: 10px;">
+                <summary>👥 参战阵容配置</summary>
+                <div style="margin-top: 15px;">
+                    <span class="section-title">总参战人数 (包含联机客机)</span>
+                    <div class="btn-group" style="margin-bottom: 8px;">
+                        <button class="toggle-btn selected" id="count2">双人</button>
+                        <button class="toggle-btn" id="count3">三人</button>
+                        <button class="toggle-btn" id="count4">四人</button>
+                    </div>
+                    
+                    <span class="section-title" style="margin-bottom: 5px; color:var(--p2)">P2 蓝蛇 控制权限</span>
+                    <div class="btn-group" style="margin-bottom: 8px;">
+                        <button class="toggle-btn selected" id="p2Human">玩家</button>
+                        <button class="toggle-btn" id="p2AI">交由 AI</button>
+                    </div>
+
+                    <div id="p3Config" style="display:none;">
+                        <span class="section-title" style="margin-bottom: 5px; color:var(--p3)">P3 黄蛇 控制权限</span>
+                        <div class="btn-group" style="margin-bottom: 8px;">
+                            <button class="toggle-btn selected" id="p3Human">玩家</button>
+                            <button class="toggle-btn" id="p3AI">交由 AI</button>
+                        </div>
+                    </div>
+
+                    <div id="p4Config" style="display:none;">
+                        <span class="section-title" style="margin-bottom: 5px; color:var(--p4)">P4 青蛇 控制权限</span>
+                        <div class="btn-group" style="margin-bottom: 8px;">
+                            <button class="toggle-btn selected" id="p4Human">玩家</button>
+                            <button class="toggle-btn" id="p4AI">交由 AI</button>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+
         <div id="diffSection">
-            <span class="section-title">AI 大脑核心</span>
+            <span class="section-title">双人 AI 核心</span>
             <div class="btn-group">
                 <button class="toggle-btn" id="diffE">[近视信徒] Myopic</button>
                 <button class="toggle-btn selected" id="diffN">[织网者] Weaver</button>
@@ -62,7 +97,7 @@
                         <button class="toggle-btn" id="judgeOff">关闭</button>
                         <button class="toggle-btn selected" id="judgeOn">开启</button>
                     </div>
-                    <span class="section-title">公平跃迁 (严格等距生成传送门)</span>
+                    <span class="section-title">公平跃迁 (等距生成传送门)</span>
                     <div class="btn-group" style="margin-bottom: 0;">
                         <button class="toggle-btn" id="fairPortalOff">随机生成</button>
                         <button class="toggle-btn selected" id="fairPortalOn">强制公平</button>
@@ -77,13 +112,23 @@
                 <input type="text" id="customRoomId" placeholder="例如: 114514" value="114514">
                 <div style="color:var(--ac);margin-top:10px;font-size:13px;text-align:center;" id="hostMsg"></div>
             </div>
+            
             <div id="joinPanel" style="display:none">
                 <span class="section-title">输入主机的房间号：</span>
                 <input type="text" id="targetRoomId" placeholder="例如: 114514" value="114514">
-                
-                <div id="roomList" style="margin-top: 15px; background: #1a1a24; border-radius: 8px; border: 1px solid #333; padding: 10px; max-height: 120px; overflow-y: auto;">
-                    <div id="roomListContent" style="color:#aaa; font-size:13px; text-align:center;">正在连接到 nz 的私有服务器...</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <span class="section-title" style="margin-bottom: 0;">📡 附近可用频道雷达：</span>
+                    <button id="btnRefreshRadar" style="background: #2e86de; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;">🔄 刷新</button>
                 </div>
+                <div id="roomList">
+                    <div id="roomListContent" style="color:#aaa; font-size:13px; text-align:center;">正在连接到雷达网...</div>
+                </div>
+            </div>
+
+            <div id="lobbyPanel" style="display:none; margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid #444;">
+                <span class="section-title" style="color: var(--ac); text-align: center; font-size: 16px;">🚀 战舰大厅等待区</span>
+                <div id="lobbyList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                <div style="font-size: 12px; color: #888; margin-top: 10px; text-align: center;">提示：主机在此确认全员加入后即可开始跃迁。</div>
             </div>
         </div>
         
@@ -98,26 +143,12 @@
     <div id="tutorialPanel" style="display: none;">
         <h2>📖 新手特训：规则说明书</h2>
         <div class="tutorial-content">
-            <p class="tut-intro">欢迎游玩《拓扑领地战》。在这里，你需要操控不断延伸的身体编织出一张网，将对手逼入死角。</p>
-            <h3>📍 1. 基础机动与胜负</h3>
-            <ul>
-                <li><b>回合制八向移动：</b>每回合可向周围 <b>8个方向</b> 移动一格。</li>
-                <li><b>绝对实体：</b>走过的尾迹会变成无法逾越的实体。不能撞墙，不能踩自己或对手的身体。</li>
-                <li><b>胜负条件：</b>率先陷入<b>“无路可走”</b>绝境的一方直接判负。</li>
-            </ul>
-            <h3>🌀 2. 跃迁枢纽 (传送门)</h3>
-            <ul>
-                <li><b>跃迁：</b>走入紫色的圆形枢纽，可瞬间传送到地图上任意其他<b>可用</b>的枢纽。</li>
-                <li><b>封锁失效：</b>若枢纽周围 8 格全被堵死，它将变灰失效。</li>
-                <li><b>幸存者法则：</b>当全图只剩最后 1 个可用枢纽时，它将变灰并拒绝任何人使用。</li>
-            </ul>
-            <h3>⚖️ 3. 智能赛点裁决 (自动裁判)</h3>
-            <ul>
-                <li>若开启此功能，当双方走位将地图切分为互不相通的区域时，系统会提前终止比赛。</li>
-                <li><b>领地判定：</b>系统将扫描双方所在区域，控制生存空间更大的一方直接获胜。</li>
-            </ul>
+            <p class="tut-intro">操控不断延伸的身体编织出一张网，将对手逼入死角。</p>
+            <h3>📍 1. 基础机动与胜负</h3><ul><li><b>八向移动：</b>每回合可向周围 <b>8个方向</b> 移动。</li><li><b>绝对实体：</b>走过的尾迹变成墙壁。</li><li><b>胜负条件：</b>陷入<b>“无路可走”</b>绝境的一方直接判负。</li></ul>
+            <h3>🌀 2. 跃迁枢纽</h3><ul><li><b>跃迁：</b>走入传送门，可瞬间传送到其他<b>可用</b>门。</li></ul>
+            <h3>⚖️ 3. 智能赛点裁决</h3><ul><li>当双方把地图切分互不相通时系统提前判局。生存空间大者获胜。</li></ul>
         </div>
-        <button id="btnBackFromTutorial" style="width:100%; padding:14px; background:#444; color:#fff; border:none; border-radius:8px; font-weight:bold; margin-top:20px; cursor:pointer;">我已了解，返回系统</button>
+        <button id="btnBackFromTutorial" style="width:100%; padding:14px; background:#444; color:#fff; border:none; border-radius:8px; font-weight:bold; margin-top:20px; cursor:pointer;">我已了解</button>
     </div>
 
     <div id="recordPanel" style="display: none;">
@@ -125,9 +156,9 @@
         <div class="record-overview">
             <div><span style="color:#aaa;font-size:12px;">总斩获</span><br><span id="statWins" style="color:var(--ac);font-size:24px;">0</span></div>
             <div><span style="color:#aaa;font-size:12px;">总败北</span><br><span id="statLosses" style="color:var(--p1);font-size:24px;">0</span></div>
-            <div><span style="color:#aaa;font-size:12px;">胜率</span><br><span id="statWinRate" style="color:#f1c40f;font-size:24px;">0%</span></div>
+            <div><span style="color:#aaa;font-size:12px;">单机胜率</span><br><span id="statWinRate" style="color:#f1c40f;font-size:24px;">0%</span></div>
         </div>
-        <span class="section-title">最近 50 场战役记录</span>
+        <span class="section-title">最近 50 场单机战役（功能即将推出）</span>
         <div id="matchHistoryList"></div>
         <div style="display:flex; gap:10px; margin-top:20px;">
             <button id="btnBackFromRecords" style="flex:2; padding:14px; background:#444; color:#fff; border:none; border-radius:8px; font-weight:bold;">返回主菜单</button>
@@ -143,34 +174,18 @@
                 <button id="backMenuBtn">退出</button>
             </div>
         </div>
-        
         <div class="canvas-wrapper">
             <canvas id="gameCanvas" width="560" height="560"></canvas>
             
             <div id="statsOverlay">
                 <div class="stat-box" style="margin-top: 150px;">
                     <h2 id="statsWinnerTitle" style="margin-top:0; font-size:22px; margin-bottom: 15px; text-align:center;">战役结束</h2>
-                    <div class="stat-row" style="border-bottom:2px solid #555; padding-bottom:10px; margin-bottom:5px;">
-                        <span class="stat-v-p1">红蛇</span>
-                        <span class="stat-center" style="color:#fff;">终局数据</span>
-                        <span class="stat-v-p2">蓝蛇</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-v-p1" id="s-m1">0</span>
-                        <span class="stat-center">机动步数</span>
-                        <span class="stat-v-p2" id="s-m2">0</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-v-p1" id="s-p1">0</span>
-                        <span class="stat-center">引擎点火</span>
-                        <span class="stat-v-p2" id="s-p2">0</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-v-p1" id="s-c1">0</span>
-                        <span class="stat-center" style="color:var(--ac);" id="s-c-label">绝对控制域</span>
-                        <span class="stat-v-p2" id="s-c2">0</span>
-                    </div>
-                    <div class="stats-btns" style="margin-top: 15px; width: 100%;">
+                    
+                    <div style="font-size: 13px; color: #aaa; text-align: center; margin-bottom: 10px;" id="s-c-label">判定依据</div>
+                    
+                    <div id="statsListContainer" style="display: flex; flex-direction: column;"></div>
+
+                    <div class="stats-btns">
                         <button onclick="document.getElementById('statsOverlay').style.display='none'">关闭面板</button>
                         <button id="btnEnterReplay">🎬 录像</button>
                     </div>
@@ -183,10 +198,7 @@
             <button id="btnReplayPlay">▶️ 播放</button>
             <button id="btnReplayNext">⏩</button>
             <select id="replaySpeedSelect">
-                <option value="1000">0.5x</option>
-                <option value="500" selected>1.0x</option>
-                <option value="200">2.0x</option>
-                <option value="50">MAX</option>
+                <option value="1000">0.5x</option><option value="500" selected>1.0x</option><option value="200">2.0x</option><option value="50">MAX</option>
             </select>
             <span id="replayStep">0 / 0</span>
             <button id="btnExitReplay">退出</button>
